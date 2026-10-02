@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOLLEY 2.0 &mdash; Tennis for Two</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app" id="app" data-phase="1">
+
+  <!-- ======================= TELA 1: LOBBY ======================= -->
+  <section class="screen screen--lobby is-active" id="lobby">
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <div class="lobby">
+      <header class="lobby__head">
+        <p class="tagline">Tennis for Two &mdash; recriado</p>
+        <h1 class="title">
+          <span class="title__ball" aria-hidden="true"></span>
+          VOLLEY<em>2.0</em>
+        </h1>
+        <p class="subtitle">3 fases &bull; Melhor de 5 pontos &bull; 1 Campe&atilde;o Geral</p>
+      </header>
+
+      <div class="lobby__players">
+        <div class="player-card player-card--p1">
+          <div class="player-card__paddle" aria-hidden="true"></div>
+          <label class="field">
+            <span class="field__label">Jogador 1</span>
+            <input class="field__input" id="inputP1" type="text" maxlength="14"
+                   placeholder="Jogador 1" autocomplete="off" spellcheck="false">
+          </label>
+        </div>
+
+        <div class="vs" aria-hidden="true">
+          <span>VS</span>
+        </div>
+
+        <div class="player-card player-card--p2">
+          <div class="player-card__paddle" aria-hidden="true"></div>
+          <label class="field">
+            <span class="field__label">Jogador 2</span>
+            <input class="field__input" id="inputP2" type="text" maxlength="14"
+                   placeholder="Jogador 2" autocomplete="off" spellcheck="false">
+          </label>
+        </div>
+      </div>
+
+      <div class="lobby__options">
+        <span class="options__label">Modo de jogo</span>
+        <div class="segmented" role="radiogroup" aria-label="Modo de jogo">
+          <button class="segmented__btn is-active" id="mode1v1" data-mode="1v1" role="radio" aria-checked="true">
+            1 Jogador vs IA
+          </button>
+          <button class="segmented__btn" id="mode2p" data-mode="2p" role="radio" aria-checked="false">
+            2 Jogadores
+          </button>
+        </div>
+        <p class="options__hint" id="modeHint">
+          P1: <kbd>W</kbd>/<kbd>S</kbd> mover · <kbd>A</kbd> bater &nbsp;|&nbsp; P2: <kbd>&uarr;</kbd>/<kbd>&darr;</kbd> mover · <kbd>&rarr;</kbd> bater
+        </p>
+      </div>
+
+      <button class="btn btn--primary btn--xl" id="btnStart" type="button">
+        <span>Iniciar Jogo</span>
+      </button>
+
+      <ul class="phase-strip">
+        <li class="phase-strip__item phase-strip__item--1"><i></i>Fase 1 &middot; Campo de Futebol</li>
+        <li class="phase-strip__item phase-strip__item--2"><i></i>Fase 2 &middot; Vulc&atilde;o e Lava</li>
+        <li class="phase-strip__item phase-strip__item--3"><i></i>Fase 3 &middot; Espacial</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ======================= TELA 2: JOGO ======================= -->
+  <section class="screen screen--game" id="gameScreen">
+    <header class="hud">
+      <div class="hud__side hud__side--p1">
+        <span class="hud__name" id="hudName1">Jogador 1</span>
+        <span class="hud__sets" id="hudSets1" title="Fases vencidas">
+          <i class="pip"></i><i class="pip"></i><i class="pip"></i>
+        </span>
+        <span class="hud__points" id="hudPoints1">0</span>
+      </div>
+
+      <div class="hud__center">
+        <span class="hud__phase" id="hudPhase">Fase 1 &middot; Campo de Futebol</span>
+        <span class="hud__bestof">MELHOR DE 5 &middot; primeiro a 3</span>
+      </div>
+
+      <div class="hud__side hud__side--p2">
+        <span class="hud__name" id="hudName2">Jogador 2</span>
+        <span class="hud__sets" id="hudSets2" title="Fases vencidas">
+          <i class="pip"></i><i class="pip"></i><i class="pip"></i>
+        </span>
+        <span class="hud__points" id="hudPoints2">0</span>
+      </div>
+    </header>
+
+    <div class="stage" id="stage">
+      <canvas id="gameCanvas" width="960" height="540" aria-label="Campo de jogo"></canvas>
+
+      <!-- Overlay interno do canvas: contagem regressiva, ponto, troca de fase -->
+      <div class="overlay" id="overlay" hidden>
+        <div class="overlay__box">
+          <p class="overlay__kicker" id="overlayKicker">Fase 1</p>
+          <h2 class="overlay__title" id="overlayTitle">Campo de Futebol</h2>
+          <p class="overlay__text" id="overlayText">Preparem-se...</p>
+        </div>
+      </div>
+
+      <button class="btn btn--ghost btn--pause" id="btnPause" type="button" title="Pausar (Esc)">Pausar</button>
+    </div>
+
+    <footer class="stage__bar">
+      <span><kbd>W</kbd>/<kbd>S</kbd> mover &middot; <kbd>A</kbd> bater</span>
+      <span><kbd>&uarr;</kbd>/<kbd>&darr;</kbd> mover &middot; <kbd>&rarr;</kbd> bater</span>
+      <span>Mouse sobre a metade da tela tamb&eacute;m controla</span>
+      <span><kbd>Esc</kbd> pausar</span>
+    </footer>
+  </section>
+
+  <!-- ======================= TELA 3: GAME OVER ======================= -->
+  <section class="screen screen--over" id="gameOver">
+    <div class="result">
+      <p class="result__kicker">Fim de jogo</p>
+      <h2 class="result__title">Campe&atilde;o Geral</h2>
+      <div class="result__champ">
+        <span class="result__crown" id="champCrown" aria-hidden="true"></span>
+        <span class="result__name" id="champName">&mdash;</span>
+      </div>
+      <p class="result__score" id="champScore">0 &times; 0</p>
+
+      <div class="table-wrap">
+        <table class="table">
+          <caption class="table__caption">Hist&oacute;rico de fases</caption>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Jogador</th>
+              <th scope="col">Venceu</th>
+              <th scope="col">Perdeu</th>
+              <th scope="col">Pontos</th>
+            </tr>
+          </thead>
+          <tbody id="scoreRows"></tbody>
+        </table>
+      </div>
+
+      <div class="result__actions">
+        <button class="btn btn--primary" id="btnRematch" type="button">Revanche</button>
+        <button class="btn btn--ghost" id="btnBackToLobby" type="button">Voltar ao Lobby</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/physics.js"></script>
+<script src="js/paddle.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/phases.js"></script>
+<script src="js/hud.js"></script>
+<script src="js/game.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
